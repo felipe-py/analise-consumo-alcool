@@ -1369,64 +1369,64 @@ Eixo 04: Riscos e consequências
 
 A relação entre os impactos negativos e o comportamento de consumo
 
--    Foi protagonista de vexame por causa do álcool vs. Frequência
+-   Foi protagonista de vexame por causa do álcool vs. Frequência
 
-    ```{r}
-    # --- Eixo 4: Riscos e Consequências ---
-    # Hipótese: A frequência de consumo está associada à probabilidade de passar por vexames.
+```{{r}}
+# --- Eixo 4: Riscos e Consequências ---
+# Hipótese: A frequência de consumo está associada à probabilidade de passar por vexames.
 
-    # --- PASSO 1: CÁLCULO (com a perspectiva invertida) ---
-    tabela_frequencia_vs_vexame <- dados_brutos %>%
-      filter(!is.na(DeuVexamePorCausaDaBebida) & !is.na(Frequencia)) %>%
-      # A mudança crucial está aqui: agrupamos pela FREQUÊNCIA
-      group_by(Frequencia) %>%
-      # Contamos as combinações DENTRO de cada grupo de frequência
-      count(DeuVexamePorCausaDaBebida) %>%
-      mutate(
-        PercentualNumerico = n / sum(n),
-        PercentualTexto = scales::percent(PercentualNumerico, accuracy = 0.1)
-      ) %>%
-      ungroup() %>%
-      rename(Quantidade = n)
+# --- PASSO 1: CÁLCULO (com a perspectiva invertida) ---
+tabela_frequencia_vs_vexame <- dados_brutos %>%
+  filter(!is.na(DeuVexamePorCausaDaBebida) & !is.na(Frequencia)) %>%
+  # A mudança crucial está aqui: agrupamos pela FREQUÊNCIA
+  group_by(Frequencia) %>%
+  # Contamos as combinações DENTRO de cada grupo de frequência
+  count(DeuVexamePorCausaDaBebida) %>%
+  mutate(
+    PercentualNumerico = n / sum(n),
+    PercentualTexto = scales::percent(PercentualNumerico, accuracy = 0.1)
+  ) %>%
+  ungroup() %>%
+  rename(Quantidade = n)
 
-    # --- PASSO 2: TESTE ESTATÍSTICO (O código não muda) ---
-    tabela_contingencia <- dados_brutos %>%
-      count(DeuVexamePorCausaDaBebida, Frequencia) %>%
-      tidyr::pivot_wider(names_from = Frequencia, values_from = n, values_fill = 0)
-    teste_qui_quadrado <- chisq.test(tabela_contingencia[, -1])
-    cat("--- Teste Qui-Quadrado de Independência ---\n\n")
-    print(teste_qui_quadrado)
-    cat("\n\n")
+# --- PASSO 2: TESTE ESTATÍSTICO (O código não muda) ---
+tabela_contingencia <- dados_brutos %>%
+  count(DeuVexamePorCausaDaBebida, Frequencia) %>%
+  tidyr::pivot_wider(names_from = Frequencia, values_from = n, values_fill = 0)
+teste_qui_quadrado <- chisq.test(tabela_contingencia[, -1])
+cat("--- Teste Qui-Quadrado de Independência ---\n\n")
+print(teste_qui_quadrado)
+cat("\n\n")
 
-    # --- PASSO 3: GRÁFICO (Adaptado para a nova perspectiva) ---
-    # O gráfico de barras 100% empilhadas é ideal aqui
-    cat("### Gráfico: Risco de Vexame por Frequência de Consumo\n")
-    ggplot(tabela_frequencia_vs_vexame, aes(x = Frequencia, y = Quantidade, fill = DeuVexamePorCausaDaBebida)) +
-      geom_bar(stat = "identity", position = "fill", alpha = 0.8) +
-      geom_text(
-        aes(label = PercentualTexto),
-        position = position_fill(vjust = 0.5),
-        color = "white",
-        size = 4
-      ) +
-      scale_y_continuous(labels = scales::percent) +
-      scale_fill_brewer(palette = "Paired", direction = -1) + # Nova paleta de cores
-      labs(
-        title = "Probabilidade de 'Dar Vexame' por Frequência de Consumo",
-        x = "Frequência de Consumo de Álcool",
-        y = "Proporção de Respostas",
-        fill = "Já Deu Vexame?"
-      ) +
-      theme_minimal(base_size = 14) +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+# --- PASSO 3: GRÁFICO (Adaptado para a nova perspectiva) ---
+# O gráfico de barras 100% empilhadas é ideal aqui
+cat("### Gráfico: Risco de Vexame por Frequência de Consumo\n")
+ggplot(tabela_frequencia_vs_vexame, aes(x = Frequencia, y = Quantidade, fill = DeuVexamePorCausaDaBebida)) +
+  geom_bar(stat = "identity", position = "fill", alpha = 0.8) +
+  geom_text(
+    aes(label = PercentualTexto),
+    position = position_fill(vjust = 0.5),
+    color = "white",
+    size = 4
+  ) +
+  scale_y_continuous(labels = scales::percent) +
+  scale_fill_brewer(palette = "Paired", direction = -1) + # Nova paleta de cores
+  labs(
+    title = "Probabilidade de 'Dar Vexame' por Frequência de Consumo",
+    x = "Frequência de Consumo de Álcool",
+    y = "Proporção de Respostas",
+    fill = "Já Deu Vexame?"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-    # --- PASSO 4: TABELA (Permanece igual) ---
-    # A tabela de cruzamento original ainda é útil para ver os números brutos
-    knitr::kable(
-      tabela_frequencia_vs_vexame,
-      caption = "Tabela de cruzamento mostrando o risco de vexame por frequência de consumo."
-    )
-    ```
+# --- PASSO 4: TABELA (Permanece igual) ---
+# A tabela de cruzamento original ainda é útil para ver os números brutos
+knitr::kable(
+  tabela_frequencia_vs_vexame,
+  caption = "Tabela de cruzamento mostrando o risco de vexame por frequência de consumo."
+)
+```
 
 -   Pegou carona com alguém sob efeito de álcool vs. Dirigiu sob efeito de álcool
 
