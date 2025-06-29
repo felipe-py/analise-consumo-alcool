@@ -1,0 +1,1645 @@
+---
+title: "Análise do Consumo de álcool entre estudantes da UEFS"
+output: html_notebook
+---
+
+#### Chamada das bibliotecas
+
+```{r}
+library(readxl)   # Para ler arquivos Excel (função read_excel)
+library(dplyr)    # Para manipular dados (funções filter, mutate, group_by, summarise)
+library(ggplot2)  # Para criar os gráficos
+library(scales)
+
+```
+
+#### Chamada da base de dados
+
+```{r}
+dados_brutos <- read_excel("QUESTIONÁRIO SOBRE O CONSUMO DE ÁLCOOL ENTRE OS ESTUDANTES DA UEFS (respostas).xlsx")
+```
+
+#### Confirmando a leitura dos dados
+
+-   Estrutura dos dados
+
+```{r}
+glimpse(dados_brutos)
+```
+
+-   Visualizando primeiras linhas dos dados
+
+```{r}
+head(dados_brutos)
+```
+
+-   Colunas
+
+```{r}
+names(dados_brutos)
+```
+
+#### Análise dos dados obtidos
+
+-   É necessária a troca de nome de colunas com caracteres não aceitos pelo R
+
+```{r}
+names(dados_brutos)[3] <- c("FaixaEtaria")
+names(dados_brutos)[5] <- c("Trabalha")
+names(dados_brutos)[6] <- c("TipoEscola")
+names(dados_brutos)[7] <- c("PossuiVeiculo")
+names(dados_brutos)[8] <- c("RendaFamiliar")
+names(dados_brutos)[9] <- c("MoraComQuem")
+names(dados_brutos)[10] <- c("Religiao")
+names(dados_brutos)[11] <- c("ImportanteNaVida")
+names(dados_brutos)[12] <- c("FamiliaIngere")
+names(dados_brutos)[13] <- c("RespondenteIngere")
+names(dados_brutos)[14] <- c("IdadeQueComecou")
+names(dados_brutos)[15] <- c("QuantosCoposDia")
+names(dados_brutos)[16] <- c("Frequencia")
+names(dados_brutos)[17] <- c("MotivoDoComecoNoAlcool")
+names(dados_brutos)[18] <- c("ImagemQueCausa")
+names(dados_brutos)[19] <- c("TipoQueToma")
+names(dados_brutos)[20] <- c("DeuVexamePorCausaDaBebida")
+names(dados_brutos)[21] <- c("SofreuAcidenteDeCarroPorCausaDaBebida")
+names(dados_brutos)[22] <- c("DirigiuSobEfeitoDoAlcool")
+names(dados_brutos)[23] <- c("PegouCaronaComAlguemSobEfeitoDaBebida")
+names(dados_brutos)[24] <- c("PaisConsomem")
+names(dados_brutos)[25] <- c("ConheceAlguemQueSeAcidentouPorCausaDaBebida")
+```
+
+-   Dados das respostas (SEXO)
+
+```{r}
+# Este bloco SÓ CALCULA e guarda o resultado.
+tabela_sexo <- dados_brutos %>%
+  count(Sexo, sort = TRUE) %>%
+  mutate(
+    Percentual = scales::percent(n / sum(n), accuracy = 0.1)
+  ) %>%
+  rename(
+    `Sexo do Respondente` = Sexo,
+    Quantidade = n
+  )
+
+# Este bloco SÓ APRESENTA a tabela formatada.
+knitr::kable(
+  tabela_sexo,
+  caption = "Distribuição dos respondentes por sexo."
+)
+
+# Este bloco SÓ APRESENTA o gráfico.
+ggplot(tabela_sexo, aes(x = reorder(`Sexo do Respondente`, -Quantidade), y = Quantidade)) +
+  geom_bar(stat = "identity", fill = "darkorchid4", alpha = 0.8) +
+  geom_text(
+    aes(label = paste0(Quantidade, "\n(", Percentual, ")")),
+    vjust = 1.5,
+    color = "white",
+    size = 4
+  ) +
+  labs(
+    title = "Distribuição dos Respondentes por Sexo",
+    x = NULL,
+    y = "Número de Respostas"
+  ) +
+  theme_minimal(base_size = 14)
+```
+
+-   Dados das respostas (FAIXA ETÁRIA)
+
+    ```{r}
+    tabela_faixa_etaria <- dados_brutos %>%
+      count(FaixaEtaria, sort = TRUE) %>%
+      mutate(
+        Percentual = scales::percent(n / sum(n), accuracy = 0.1)
+      ) %>%
+      rename(
+        `Faixa etária do Respondente` = FaixaEtaria,
+        Quantidade = n
+      )
+
+    knitr::kable(
+      tabela_faixa_etaria,
+      caption = "Distribuição dos respondentes por faixa etária."
+    )
+
+    ggplot(tabela_faixa_etaria, aes(x = reorder(`Faixa etária do Respondente`, -Quantidade), y = Quantidade)) +
+      geom_bar(stat = "identity", fill = "darkorchid4", alpha = 0.8) +
+      geom_text(
+        aes(label = paste0(Quantidade, "\n(", Percentual, ")")),
+        vjust = 1.5,
+        color = "white",
+        size = 4
+      ) +
+      labs(
+        title = "Distribuição dos Respondentes por Faixa etária",
+        x = NULL,
+        y = "Número de Respostas"
+      ) +
+      theme_minimal(base_size = 9)
+    ```
+
+-   Dados das respostas (SEMESTRE)
+
+    ```{r}
+    tabela_semestre <- dados_brutos %>%
+      count(Semestre, sort = TRUE) %>%
+      mutate(
+        Percentual = scales::percent(n / sum(n), accuracy = 0.1)
+      ) %>%
+      rename(
+        `Semestre do Respondente` = Semestre,
+        Quantidade = n
+      )
+
+    knitr::kable(
+      tabela_semestre,
+      caption = "Semestre do Respondente"
+    )
+
+    ggplot(tabela_semestre, aes(x = reorder(`Semestre do Respondente`, -Quantidade), y = Quantidade)) +
+      geom_bar(stat = "identity", fill = "darkorchid4", alpha = 0.8) +
+      geom_text(
+        aes(label = paste0(Quantidade, "\n(", Percentual, ")")),
+        vjust = 1.5,
+        color = "white",
+        size = 4
+      ) +
+      labs(
+        title = "Semestre",
+        x = NULL,
+        y = "Número de Respostas"
+      ) +
+      theme_minimal(base_size = 7)
+    ```
+
+-   Dados das respostas (TRABALHO)
+
+    ```{r}
+    tabela_trabalha <- dados_brutos %>%
+      count(Trabalha, sort = TRUE) %>%
+      mutate(
+        Percentual = scales::percent(n / sum(n), accuracy = 0.1)
+      ) %>%
+      rename(
+        `Respondente trabalha?` = Trabalha,
+        Quantidade = n
+      )
+
+    knitr::kable(
+      tabela_trabalha,
+      caption = "Respondente trabalha?"
+    )
+
+    ggplot(tabela_trabalha, aes(x = reorder(`Respondente trabalha?`, -Quantidade), y = Quantidade)) +
+      geom_bar(stat = "identity", fill = "darkorchid4", alpha = 0.8) +
+      geom_text(
+        aes(label = paste0(Quantidade, "\n(", Percentual, ")")),
+        vjust = 1.5,
+        color = "white",
+        size = 4
+      ) +
+      labs(
+        title = "Respondente trabalha?",
+        x = NULL,
+        y = "Número de Respostas"
+      ) +
+      theme_minimal(base_size = 14)
+    ```
+
+-   Dados das respostas (TIPO DE ESCOLA QUE ESTUDOU)
+
+    ```{r}
+    tabela_escola <- dados_brutos %>%
+      count(TipoEscola, sort = TRUE) %>%
+      mutate(
+        Percentual = scales::percent(n / sum(n), accuracy = 0.1)
+      ) %>%
+      rename(
+        `Tipo de escola que estudou?` = TipoEscola,
+        Quantidade = n
+      )
+
+    knitr::kable(
+      tabela_escola,
+      caption = "Tipo de escola que estudou?"
+    )
+
+    ggplot(tabela_escola, aes(x = reorder(`Tipo de escola que estudou?`, -Quantidade), y = Quantidade)) +
+      geom_bar(stat = "identity", fill = "darkorchid4", alpha = 0.8) +
+      geom_text(
+        aes(label = paste0(Quantidade, "\n(", Percentual, ")")),
+        vjust = 1.5,
+        color = "white",
+        size = 4
+      ) +
+      labs(
+        title = "Tipo de escola que estudou?",
+        x = NULL,
+        y = "Número de Respostas"
+      ) +
+      theme_minimal(base_size = 14)
+    ```
+
+-   Dados das Respostas (POSSUI VEÍCULO)
+
+    ```{r}
+    tabela_veiculo <- dados_brutos %>%
+      count(PossuiVeiculo, sort = TRUE) %>%
+      mutate(
+        Percentual = scales::percent(n / sum(n), accuracy = 0.1)
+      ) %>%
+      rename(
+        `Possui veiculo?` = PossuiVeiculo,
+        Quantidade = n
+      )
+
+    knitr::kable(
+      tabela_veiculo,
+      caption = "Possui veiculo?"
+    )
+
+    ggplot(tabela_veiculo, aes(x = reorder(`Possui veiculo?`, -Quantidade), y = Quantidade)) +
+      geom_bar(stat = "identity", fill = "darkorchid4", alpha = 0.8) +
+      geom_text(
+        aes(label = paste0(Quantidade, "\n(", Percentual, ")")),
+        vjust = 1.5,
+        color = "white",
+        size = 4
+      ) +
+      labs(
+        title = "Possui veículo?",
+        x = NULL,
+        y = "Número de Respostas"
+      ) +
+      theme_minimal(base_size = 14)
+    ```
+
+-   Dados das respostas (RENDA FAMILIAR)
+
+    ```{r}
+    tabela_renda <- dados_brutos %>%
+      count(RendaFamiliar, sort = TRUE) %>%
+      mutate(
+        Percentual = scales::percent(n / sum(n), accuracy = 0.1)
+      ) %>%
+      rename(
+        `Renda familiar` = RendaFamiliar,
+        Quantidade = n
+      )
+
+    knitr::kable(
+      tabela_renda,
+      caption = "Renda familiar"
+    )
+
+    ggplot(tabela_renda, aes(x = reorder(`Renda familiar`, -Quantidade), y = Quantidade)) +
+      geom_bar(stat = "identity", fill = "darkorchid4", alpha = 0.8) +
+      geom_text(
+        aes(label = paste0(Quantidade, "\n(", Percentual, ")")),
+        vjust = 1.5,
+        color = "white",
+        size = 4
+      ) +
+      labs(
+        title = "Renda familiar:",
+        x = NULL,
+        y = "Número de Respostas"
+      ) +
+      theme_minimal(base_size = 9)
+    ```
+
+-   Dados das respostas (MORA COM QUEM?)
+
+    ```{r}
+    tabela_moradia <- dados_brutos %>%
+      count(MoraComQuem, sort = TRUE) %>%
+      mutate(
+        Percentual = scales::percent(n / sum(n), accuracy = 0.1)
+      ) %>%
+      rename(
+        `Mora com quem?` = MoraComQuem,
+        Quantidade = n
+      )
+
+    knitr::kable(
+      tabela_moradia,
+      caption = "Mora com quem?"
+    )
+
+    ggplot(tabela_moradia, aes(x = reorder(`Mora com quem?`, -Quantidade), y = Quantidade)) +
+      geom_bar(stat = "identity", fill = "darkorchid4", alpha = 0.8) +
+      geom_text(
+        aes(label = paste0(Quantidade, "\n(", Percentual, ")")),
+        vjust = 1.5,
+        color = "white",
+        size = 4
+      ) +
+      labs(
+        title = "Mora com quem?",
+        x = NULL,
+        y = "Número de Respostas"
+      ) +
+      theme_minimal(base_size = 14)
+    ```
+
+-   Dados das respostas (RELIGIÃO)
+
+    ```{r}
+    tabela_religiao <- dados_brutos %>%
+      count(Religiao, sort = TRUE) %>%
+      mutate(
+        Percentual = scales::percent(n / sum(n), accuracy = 0.1)
+      ) %>%
+      rename(
+        `Religiao` = Religiao,
+        Quantidade = n
+      )
+
+    knitr::kable(
+      tabela_religiao,
+      caption = "Religiao"
+    )
+
+    ggplot(tabela_religiao, aes(x = reorder(`Religiao`, -Quantidade), y = Quantidade)) +
+      geom_bar(stat = "identity", fill = "darkorchid4", alpha = 0.8) +
+      geom_text(
+        aes(label = paste0(Quantidade, "\n(", Percentual, ")")),
+        vjust = 1.5,
+        color = "white",
+        size = 4
+      ) +
+      labs(
+        title = "Religiao",
+        x = NULL,
+        y = "Número de Respostas"
+      ) +
+      theme_minimal(base_size = 14)
+    ```
+
+-   Importância do álcool na vida
+
+    ```{r}
+    # 1. CÁLCULO
+    tabela_importancia <- dados_brutos %>%
+      count(ImportanteNaVida, sort = TRUE) %>%
+      mutate(Percentual = scales::percent(n / sum(n), accuracy = 0.1)) %>%
+      rename(Resposta = ImportanteNaVida, Quantidade = n)
+
+    # 2. TABELA
+    knitr::kable(
+      tabela_importancia,
+      caption = "A bebida alcoólica é importante na sua vida?"
+    )
+
+    # 3. GRÁFICO
+    ggplot(tabela_importancia, aes(x = reorder(Resposta, -Quantidade), y = Quantidade)) +
+      geom_bar(stat = "identity", fill = "#5DADE2", alpha = 0.8) +
+      geom_text(aes(label = paste0(Quantidade, "\n(", Percentual, ")")), vjust = 1.5, color = "white", size = 4) +
+      labs(title = "A bebida alcoólica é importante na sua vida?", x = NULL, y = "Número de Respostas") +
+      theme_minimal(base_size = 14)
+    ```
+
+-   Família ingere bebida alcoólica
+
+    ```{r}
+    # 1. CÁLCULO
+    tabela_familia_ingere <- dados_brutos %>%
+      count(FamiliaIngere, sort = TRUE) %>%
+      mutate(Percentual = scales::percent(n / sum(n), accuracy = 0.1)) %>%
+      rename(Resposta = FamiliaIngere, Quantidade = n)
+
+    # 2. TABELA
+    knitr::kable(
+      tabela_familia_ingere,
+      caption = "Na sua família as pessoas tomam bebidas alcoólicas?"
+    )
+
+    # 3. GRÁFICO
+    ggplot(tabela_familia_ingere, aes(x = reorder(Resposta, -Quantidade), y = Quantidade)) +
+      geom_bar(stat = "identity", fill = "#5DADE2", alpha = 0.8) +
+      geom_text(aes(label = paste0(Quantidade, "\n(", Percentual, ")")), vjust = 1.5, color = "white", size = 4) +
+      labs(title = "Na sua família as pessoas tomam bebidas alcoólicas?", x = NULL, y = "Número de Respostas") +
+      theme_minimal(base_size = 14)
+    ```
+
+-   Você ingere?
+
+    ```{r}
+    # 1. CÁLCULO
+    tabela_respondente_ingere <- dados_brutos %>%
+      count(RespondenteIngere, sort = TRUE) %>%
+      mutate(Percentual = scales::percent(n / sum(n), accuracy = 0.1)) %>%
+      rename(Resposta = RespondenteIngere, Quantidade = n)
+
+    # 2. TABELA
+    knitr::kable(
+      tabela_respondente_ingere,
+      caption = "Você toma bebidas alcoólicas?"
+    )
+
+    # 3. GRÁFICO
+    ggplot(tabela_respondente_ingere, aes(x = reorder(Resposta, -Quantidade), y = Quantidade)) +
+      geom_bar(stat = "identity", fill = "#5DADE2", alpha = 0.8) +
+      geom_text(aes(label = paste0(Quantidade, "\n(", Percentual, ")")), vjust = 1.5, color = "white", size = 4) +
+      labs(title = "Você toma bebidas alcoólicas?", x = NULL, y = "Número de Respostas") +
+      theme_minimal(base_size = 14)
+    ```
+
+-   Idade que começou a consumir
+
+    ```{r}
+    tabela_idade <- dados_brutos %>%
+      count(IdadeQueComecou, sort = TRUE) %>%
+      mutate(
+        Percentual = scales::percent(n / sum(n), accuracy = 0.1)
+      ) %>%
+      rename(
+        `Idade que comecou` = IdadeQueComecou,
+        Quantidade = n
+      )
+
+    knitr::kable(
+      tabela_idade,
+      caption = "Idade que comecou"
+    )
+
+    ggplot(tabela_idade, aes(x = reorder(`Idade que comecou`, -Quantidade), y = Quantidade)) +
+      geom_bar(stat = "identity", fill = "#5DADE2", alpha = 0.8) +
+      geom_text(
+        aes(label = paste0(Quantidade, "\n(", Percentual, ")")),
+        vjust = 1.5,
+        color = "white",
+        size = 4
+      ) +
+      labs(
+        title = "Idade que comecou a Ingerir",
+        x = NULL,
+        y = "Número de Respostas"
+      ) +
+      theme_minimal(base_size = 4)
+    ```
+
+-   Quantidade de copos por dia
+
+    ```{r}
+    tabela_copos <- dados_brutos %>%
+      count(QuantosCoposDia, sort = TRUE) %>%
+      mutate(
+        Percentual = scales::percent(n / sum(n), accuracy = 0.1)
+      ) %>%
+      rename(
+        `Consumo Diário` = QuantosCoposDia,
+        Quantidade = n
+      )
+
+    # 2. TABELA
+    knitr::kable(tabela_copos, caption = "Quantos copos por dia?")
+
+    # 3. GRÁFICO
+    ggplot(tabela_copos, aes(x = `Consumo Diário`, y = Quantidade)) +
+      geom_bar(stat = "identity", fill = "#5DADE2", alpha = 0.8) +
+      geom_text(aes(label = paste0(Quantidade, "\n(", Percentual, ")")), vjust = 1.5, color = "white", size = 4) +
+      labs(title = "Quantidade de Copos Consumidos por Dia", x = NULL, y = "Número de Respostas") +
+      theme_minimal(base_size = 14) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    ```
+
+-   Frequência
+
+    ```{r}
+    # 1. CÁLCULO E ORDENAÇÃO
+    niveis_frequencia <- c(
+      "Fins de semana", "Três vezes ao mês", "Duas vezes ao mês", 
+      "Só em festas", "Outra", "Não consumo bebidas alcoólicas"
+    )
+
+    tabela_frequencia <- dados_brutos %>%
+      mutate(Frequencia = factor(Frequencia, levels = niveis_frequencia)) %>%
+      count(Frequencia) %>%
+      filter(!is.na(Frequencia)) %>%
+      mutate(Percentual = scales::percent(n / sum(n), accuracy = 0.1)) %>%
+      rename(`Frequência de Consumo` = Frequencia, Quantidade = n)
+
+    # 2. TABELA
+    knitr::kable(tabela_frequencia, caption = "Com que frequência?")
+
+    # 3. GRÁFICO
+    ggplot(tabela_frequencia, aes(x = `Frequência de Consumo`, y = Quantidade)) +
+      geom_bar(stat = "identity", fill = "#5DADE2", alpha = 0.8) +
+      geom_text(aes(label = paste0(Quantidade, "\n(", Percentual, ")")), vjust = 1.5, color = "white", size = 4) +
+      labs(title = "Frequência do Consumo de Álcool", x = NULL, y = "Número de Respostas") +
+      theme_minimal(base_size = 14) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    ```
+
+-   Motivo de iniciar o consumo de álcool
+
+    ```{r}
+    # 1. CÁLCULO
+    tabela_motivo <- dados_brutos %>%
+      count(MotivoDoComecoNoAlcool, sort = TRUE) %>%
+      mutate(Percentual = scales::percent(n / sum(n), accuracy = 0.1)) %>%
+      rename(Motivo = MotivoDoComecoNoAlcool, Quantidade = n)
+
+    # 2. TABELA
+    knitr::kable(tabela_motivo, caption = "Por qual motivo começou a tomar bebida alcoólica?")
+
+    # 3. GRÁFICO
+    ggplot(tabela_motivo, aes(x = reorder(Motivo, -Quantidade), y = Quantidade)) +
+      geom_bar(stat = "identity", fill = "#3498DB", alpha = 0.8) +
+      geom_text(aes(label = paste0(Quantidade, "\n(", Percentual, ")")), vjust = 1.5, color = "white", size = 4) +
+      labs(title = "Motivo de Início do Consumo de Álcool", x = NULL, y = "Número de Respostas") +
+      theme_minimal(base_size = 9) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    ```
+
+-   Imagem que a bebida causa
+
+    ```{r}
+    # 1. CÁLCULO
+    tabela_imagem <- dados_brutos %>%
+      count(ImagemQueCausa, sort = TRUE) %>%
+      mutate(Percentual = scales::percent(n / sum(n), accuracy = 0.1)) %>%
+      rename(Imagem = ImagemQueCausa, Quantidade = n)
+
+    # 2. TABELA
+    knitr::kable(tabela_imagem, caption = "Que imagem causa em você a bebida alcoólica?")
+
+    # 3. GRÁFICO
+    ggplot(tabela_imagem, aes(x = reorder(Imagem, -Quantidade), y = Quantidade)) +
+      geom_bar(stat = "identity", fill = "#3498DB", alpha = 0.8) +
+      geom_text(aes(label = paste0(Quantidade, "\n(", Percentual, ")")), vjust = 1.5, color = "white", size = 4) +
+      labs(title = "Imagem Causada pela Bebida Alcoólica", x = NULL, y = "Número de Respostas") +
+      theme_minimal(base_size = 9)
+    ```
+
+-   Tipo de bebida que ingere
+
+    ```{r}
+    # 1. CÁLCULO
+    tabela_tipo <- dados_brutos %>%
+      count(TipoQueToma, sort = TRUE) %>%
+      mutate(Percentual = scales::percent(n / sum(n), accuracy = 0.1)) %>%
+      rename(`Tipo de Bebida` = TipoQueToma, Quantidade = n)
+
+    # 2. TABELA
+    knitr::kable(tabela_tipo, caption = "Qual tipo de bebida alcoólica costuma tomar?")
+
+    # 3. GRÁFICO
+    ggplot(tabela_tipo, aes(x = reorder(`Tipo de Bebida`, -Quantidade), y = Quantidade)) +
+      geom_bar(stat = "identity", fill = "#3498DB", alpha = 0.8) +
+      geom_text(aes(label = paste0(Quantidade, "\n(", Percentual, ")")), vjust = 1.5, color = "white", size = 4) +
+      labs(title = "Tipo de Bebida Alcoólica Consumida", x = NULL, y = "Número de Respostas") +
+      theme_minimal(base_size = 9)
+    ```
+
+-   Vexame por causa da bebida
+
+    ```{r}
+    # 1. CÁLCULO
+    tabela_vexame <- dados_brutos %>%
+      count(DeuVexamePorCausaDaBebida, sort = TRUE) %>%
+      mutate(Percentual = scales::percent(n / sum(n), accuracy = 0.1)) %>%
+      rename(Resposta = DeuVexamePorCausaDaBebida, Quantidade = n)
+
+    # 2. TABELA
+    knitr::kable(tabela_vexame, caption = "Já deu algum vexame por causa da bebida?")
+
+    # 3. GRÁFICO
+    ggplot(tabela_vexame, aes(x = reorder(Resposta, -Quantidade), y = Quantidade)) +
+      geom_bar(stat = "identity", fill = "#3498DB", alpha = 0.8) +
+      geom_text(aes(label = paste0(Quantidade, "\n(", Percentual, ")")), vjust = 1.5, color = "white", size = 4) +
+      labs(title = "Já deu algum vexame por causa da bebida?", x = NULL, y = "Número de Respostas") +
+      theme_minimal(base_size = 14)
+    ```
+
+-   Sofreu acidente de carro por causa da bebida
+
+    ```{r}
+    # 1. CÁLCULO
+    tabela_acidente <- dados_brutos %>%
+      count(SofreuAcidenteDeCarroPorCausaDaBebida, sort = TRUE) %>%
+      mutate(Percentual = scales::percent(n / sum(n), accuracy = 0.1)) %>%
+      rename(Resposta = SofreuAcidenteDeCarroPorCausaDaBebida, Quantidade = n)
+
+    # 2. TABELA
+    knitr::kable(tabela_acidente, caption = "Já sofreu algum acidente de carro por causa da bebida?")
+
+    # 3. GRÁFICO
+    ggplot(tabela_acidente, aes(x = reorder(Resposta, -Quantidade), y = Quantidade)) +
+      geom_bar(stat = "identity", fill = "#3498DB", alpha = 0.8) +
+      geom_text(aes(label = paste0(Quantidade, "\n(", Percentual, ")")), vjust = 1.5, color = "white", size = 4) +
+      labs(title = "Já sofreu algum acidente de carro por causa da bebida?", x = NULL, y = "Número de Respostas") +
+      theme_minimal(base_size = 14)
+    ```
+
+-   Dirigiu sob efeito de álcool
+
+    ```{r}
+    # 1. CÁLCULO
+    tabela_dirigiu <- dados_brutos %>%
+      count(DirigiuSobEfeitoDoAlcool, sort = TRUE) %>%
+      mutate(Percentual = scales::percent(n / sum(n), accuracy = 0.1)) %>%
+      rename(Resposta = DirigiuSobEfeitoDoAlcool, Quantidade = n)
+
+    # 2. TABELA
+    knitr::kable(tabela_dirigiu, caption = "Já dirigiu sobre efeito do álcool?")
+
+    # 3. GRÁFICO
+    ggplot(tabela_dirigiu, aes(x = reorder(Resposta, -Quantidade), y = Quantidade)) +
+      geom_bar(stat = "identity", fill = "#3498DB", alpha = 0.8) +
+      geom_text(aes(label = paste0(Quantidade, "\n(", Percentual, ")")), vjust = 1.5, color = "white", size = 4) +
+      labs(title = "Já dirigiu sobre efeito do álcool?", x = NULL, y = "Número de Respostas") +
+      theme_minimal(base_size = 14)
+    ```
+
+-   Pegou carona com alguém sob efeito de álcool
+
+    ```{r}
+    # 1. CÁLCULO
+    tabela_carona <- dados_brutos %>%
+      count(PegouCaronaComAlguemSobEfeitoDaBebida, sort = TRUE) %>%
+      mutate(Percentual = scales::percent(n / sum(n), accuracy = 0.1)) %>%
+      rename(Resposta = PegouCaronaComAlguemSobEfeitoDaBebida, Quantidade = n)
+
+    # 2. TABELA
+    knitr::kable(tabela_carona, caption = "Já pegou carona com alguém que dirigiu sobre efeito do álcool?")
+
+    # 3. GRÁFICO
+    ggplot(tabela_carona, aes(x = reorder(Resposta, -Quantidade), y = Quantidade)) +
+      geom_bar(stat = "identity", fill = "#3498DB", alpha = 0.8) +
+      geom_text(aes(label = paste0(Quantidade, "\n(", Percentual, ")")), vjust = 1.5, color = "white", size = 4) +
+      labs(title = "Já pegou carona com alguém alcoolizado?", x = NULL, y = "Número de Respostas") +
+      theme_minimal(base_size = 14)
+    ```
+
+-   Pais consomem bebida alcoólica
+
+    ```{r}
+    # 1. CÁLCULO
+    tabela_pais <- dados_brutos %>%
+      count(PaisConsomem, sort = TRUE) %>%
+      mutate(Percentual = scales::percent(n / sum(n), accuracy = 0.1)) %>%
+      rename(Resposta = PaisConsomem, Quantidade = n)
+
+    # 2. TABELA
+    knitr::kable(tabela_pais, caption = "Seus pais consomem bebida alcoólica?")
+
+    # 3. GRÁFICO
+    ggplot(tabela_pais, aes(x = reorder(Resposta, -Quantidade), y = Quantidade)) +
+      geom_bar(stat = "identity", fill = "#3498DB", alpha = 0.8) +
+      geom_text(aes(label = paste0(Quantidade, "\n(", Percentual, ")")), vjust = 1.5, color = "white", size = 4) +
+      labs(title = "Seus pais consomem bebida alcoólica?", x = NULL, y = "Número de Respostas") +
+      theme_minimal(base_size = 14)
+    ```
+
+-   Conhece alguém próximo que sofreu acidente por causa da bebida
+
+    ```{r}
+    # 1. CÁLCULO
+    tabela_conhecido <- dados_brutos %>%
+      count(ConheceAlguemQueSeAcidentouPorCausaDaBebida, sort = TRUE) %>%
+      mutate(Percentual = scales::percent(n / sum(n), accuracy = 0.1)) %>%
+      rename(Resposta = ConheceAlguemQueSeAcidentouPorCausaDaBebida, Quantidade = n)
+
+    # 2. TABELA
+    knitr::kable(tabela_conhecido, caption = "Conhece alguém próximo que sofreu um acidente por causa de bebida?")
+
+    # 3. GRÁFICO
+    ggplot(tabela_conhecido, aes(x = reorder(Resposta, -Quantidade), y = Quantidade)) +
+      geom_bar(stat = "identity", fill = "#3498DB", alpha = 0.8) +
+      geom_text(aes(label = paste0(Quantidade, "\n(", Percentual, ")")), vjust = 1.5, color = "white", size = 4) +
+      labs(title = "Conhece alguém próximo que se acidentou por causa da bebida?", x = NULL, y = "Número de Respostas") +
+      theme_minimal(base_size = 14)
+    ```
+
+    #### Cruzando os dados em cinco eixos principais
+
+    Eixo 01: Perfil de consumo (Demografia vs. consumo)
+
+-   Sexo vs. Respondente ingere
+
+    Analisamos se a proporção de consumo de álcool muda à depender do gênero do respondente
+
+    ```{r}
+
+    # CÁLCULO DE CRUZAMENTO E PERCENTUAIS
+    tabela_sexo_vs_consumo <- dados_brutos %>% filter(!is.na(Sexo) & !is.na(RespondenteIngere)) %>%
+      count(Sexo, RespondenteIngere) %>% group_by(Sexo) %>%
+      mutate(
+        Percentual = scales::percent(n / sum(n), accuracy=0.1)
+      ) %>% ungroup() %>% rename(Quantidade = n)
+
+    # TESTE ESTATÍSTICO (QUI-QUADRADO)
+    tabela_contigencia <- dados_brutos %>%
+      count(Sexo, RespondenteIngere) %>%
+      tidyr::pivot_wider(names_from = RespondenteIngere, values_from = n, values_fill = 0)
+
+    teste_qui_quadrado <- chisq.test(tabela_contigencia[, -1])
+    cat("=== TESTE QUI-QUADRADO ===")
+    print(teste_qui_quadrado)
+    cat("\n\n")
+
+    # GRÁFICO
+    ggplot(tabela_sexo_vs_consumo, aes(x = Sexo, y = Quantidade, fill = RespondenteIngere)) +
+      # position="fill" cria as barras de 100%
+      geom_bar(stat = "identity", position = "fill", alpha = 0.8) +
+      # Adiciona os rótulos de percentual no meio de cada segmento da barra
+      geom_text(
+        aes(label = Percentual),
+        position = position_fill(vjust = 0.5), # Centraliza o texto no segmento
+        color = "white",
+        size = 4
+      ) +
+      # Inverte a ordem das cores para "Sim" ficar em cima (opcional)
+      scale_fill_discrete(direction = -1) +
+      # Formata o eixo y para mostrar percentuais
+      scale_y_continuous(labels = scales::percent) +
+      labs(
+        title = "Proporção de Consumo de Álcool por Sexo",
+        x = "Sexo do Respondente",
+        y = "Percentual",
+        fill = "Consome Álcool?" # Muda o título da legenda
+      ) +
+      theme_minimal(base_size = 14)
+
+
+    # TABELA
+    cat("\n\n### Tabela de Cruzamento: Sexo vs. Consumo de Álcool\n")
+    knitr::kable(
+      tabela_sexo_vs_consumo,
+      caption = "Tabela de cruzamento mostrando a quantidade e o percentual de consumo por sexo."
+    )
+    ```
+
+-   Religião vs. Respondente ingere
+
+    Analisamos se a proporção de consumo muda conforme a religião do respondente
+
+    ```{r}
+    # CÁLCULO DE CRUZAMENTO E PERCENTUAIS
+    tabela_religiao_vs_consumo <- dados_brutos %>% filter(!is.na(Religiao) & !is.na(RespondenteIngere)) %>%
+      count(Religiao, RespondenteIngere) %>% group_by(Religiao) %>%
+      mutate(
+        Percentual = scales::percent(n / sum(n), accuracy=0.1)
+      ) %>% ungroup() %>% rename(Quantidade = n)
+
+    # TESTE ESTATÍSTICO (QUI-QUADRADO)
+    tabela_contigencia <- dados_brutos %>%
+      count(Religiao, RespondenteIngere) %>%
+      tidyr::pivot_wider(names_from = RespondenteIngere, values_from = n, values_fill = 0)
+
+    teste_qui_quadrado <- chisq.test(tabela_contigencia[, -1])
+    cat("=== TESTE QUI-QUADRADO ===")
+    print(teste_qui_quadrado)
+    cat("\n\n")
+
+    # GRÁFICO
+    ggplot(tabela_religiao_vs_consumo, aes(x = Religiao, y = Quantidade, fill = RespondenteIngere)) +
+      # position="fill" cria as barras de 100%
+      geom_bar(stat = "identity", position = "fill", alpha = 0.8) +
+      # Adiciona os rótulos de percentual no meio de cada segmento da barra
+      geom_text(
+        aes(label = Percentual),
+        position = position_fill(vjust = 0.5), # Centraliza o texto no segmento
+        color = "white",
+        size = 4
+      ) +
+      # Inverte a ordem das cores para "Sim" ficar em cima (opcional)
+      scale_fill_discrete(direction = -1) +
+      # Formata o eixo y para mostrar percentuais
+      scale_y_continuous(labels = scales::percent) +
+      labs(
+        title = "Proporção de Consumo de Álcool por Religião",
+        x = "Religião do Respondente",
+        y = "Percentual",
+        fill = "Consome Álcool?" # Muda o título da legenda
+      ) +
+      theme_minimal(base_size = 14)
+
+
+    # TABELA
+    cat("\n\n### Tabela de Cruzamento: Religião vs. Consumo de Álcool\n")
+    knitr::kable(
+      tabela_religiao_vs_consumo,
+      caption = "Tabela de cruzamento mostrando a quantidade e o percentual de consumo por religião."
+    )
+    ```
+
+-   Pais consomem vs. Respondente ingere
+
+    Verificamos se o fato dos pais do respondente consumirem ou não bebida alcoólica interfere em seu comportamento
+
+    ```{r}
+    # CÁLCULO DE CRUZAMENTO E PERCENTUAIS
+    tabela_paisConsomem_vs_consumo <- dados_brutos %>% filter(!is.na(PaisConsomem) & !is.na(RespondenteIngere)) %>%
+      count(PaisConsomem, RespondenteIngere) %>% group_by(PaisConsomem) %>%
+      mutate(
+        Percentual = scales::percent(n / sum(n), accuracy=0.1)
+      ) %>% ungroup() %>% rename(Quantidade = n)
+
+    # TESTE ESTATÍSTICO (QUI-QUADRADO)
+    tabela_contigencia <- dados_brutos %>%
+      count(PaisConsomem, RespondenteIngere) %>%
+      tidyr::pivot_wider(names_from = RespondenteIngere, values_from = n, values_fill = 0)
+
+    teste_qui_quadrado <- chisq.test(tabela_contigencia[, -1])
+    cat("=== TESTE QUI-QUADRADO ===")
+    print(teste_qui_quadrado)
+    cat("\n\n")
+
+    # GRÁFICO
+    ggplot(tabela_paisConsomem_vs_consumo, aes(x = PaisConsomem, y = Quantidade, fill = RespondenteIngere)) +
+      # position="fill" cria as barras de 100%
+      geom_bar(stat = "identity", position = "fill", alpha = 0.8) +
+      # Adiciona os rótulos de percentual no meio de cada segmento da barra
+      geom_text(
+        aes(label = Percentual),
+        position = position_fill(vjust = 0.5), # Centraliza o texto no segmento
+        color = "white",
+        size = 4
+      ) +
+      # Inverte a ordem das cores para "Sim" ficar em cima (opcional)
+      scale_fill_discrete(direction = -1) +
+      # Formata o eixo y para mostrar percentuais
+      scale_y_continuous(labels = scales::percent) +
+      labs(
+        title = "Proporção de Consumo de Álcool por Pais que consomem",
+        x = "Pais consomem",
+        y = "Percentual",
+        fill = "Consome Álcool?" # Muda o título da legenda
+      ) +
+      theme_minimal(base_size = 14)
+
+
+    # TABELA
+    cat("\n\n### Tabela de Cruzamento: Pais consomem vs. Consumo de Álcool\n")
+    knitr::kable(
+      tabela_paisConsomem_vs_consumo,
+      caption = "Tabela de cruzamento mostrando a quantidade e o percentual de consumo por pais que consomem"
+    )
+    ```
+
+-   Renda familiar vs. Respondente ingere
+
+    Analisamos se a renda familiar do respondente interfere em seu comportamento em relaçao as bebidas alcoólicas
+
+```{r}
+# CÁLCULO DE CRUZAMENTO E PERCENTUAIS
+tabela_renda_vs_consumo <- dados_brutos %>% filter(!is.na(RendaFamiliar) & !is.na(RespondenteIngere)) %>%
+  count(RendaFamiliar, RespondenteIngere) %>% group_by(RendaFamiliar) %>%
+  mutate(
+    Percentual = scales::percent(n / sum(n), accuracy=0.1)
+  ) %>% ungroup() %>% rename(Quantidade = n)
+
+# TESTE ESTATÍSTICO (QUI-QUADRADO)
+tabela_contigencia <- dados_brutos %>%
+  count(RendaFamiliar, RespondenteIngere) %>%
+  tidyr::pivot_wider(names_from = RespondenteIngere, values_from = n, values_fill = 0)
+
+teste_qui_quadrado <- chisq.test(tabela_contigencia[, -1])
+cat("=== TESTE QUI-QUADRADO ===")
+print(teste_qui_quadrado)
+cat("\n\n")
+
+# GRÁFICO
+ggplot(tabela_renda_vs_consumo, aes(x = RendaFamiliar, y = Quantidade, fill = RespondenteIngere)) +
+  # position="fill" cria as barras de 100%
+  geom_bar(stat = "identity", position = "fill", alpha = 0.8) +
+  # Adiciona os rótulos de percentual no meio de cada segmento da barra
+  geom_text(
+    aes(label = Percentual),
+    position = position_fill(vjust = 0.5), # Centraliza o texto no segmento
+    color = "white",
+    size = 4
+  ) +
+  # Inverte a ordem das cores para "Sim" ficar em cima (opcional)
+  scale_fill_discrete(direction = -1) +
+  # Formata o eixo y para mostrar percentuais
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    title = "Proporção de Consumo de Álcool por Renda",
+    x = "Renda",
+    y = "Percentual",
+    fill = "Consome Álcool?" # Muda o título da legenda
+  ) +
+  theme_minimal(base_size = 8)
+
+
+# TABELA
+cat("\n\n### Tabela de Cruzamento: Renda vs. Consumo de Álcool\n")
+knitr::kable(
+  tabela_renda_vs_consumo,
+  caption = "Tabela de cruzamento mostrando a quantidade e o percentual de consumo por renda"
+)
+```
+
+-   Trabalha vs. Respondente ingere
+
+    É analisada se a situação empregatícia do respondente interfere no comportamento em relação a beber ou não álcool.
+
+    ```{r}
+    # CÁLCULO DE CRUZAMENTO E PERCENTUAIS
+    tabela_trabalha_vs_consumo <- dados_brutos %>% filter(!is.na(Trabalha) & !is.na(RespondenteIngere)) %>%
+      count(Trabalha, RespondenteIngere) %>% group_by(Trabalha) %>%
+      mutate(
+        Percentual = scales::percent(n / sum(n), accuracy=0.1)
+      ) %>% ungroup() %>% rename(Quantidade = n)
+
+    # TESTE ESTATÍSTICO (QUI-QUADRADO)
+    tabela_contigencia <- dados_brutos %>%
+      count(Trabalha, RespondenteIngere) %>%
+      tidyr::pivot_wider(names_from = RespondenteIngere, values_from = n, values_fill = 0)
+
+    teste_qui_quadrado <- chisq.test(tabela_contigencia[, -1])
+    cat("=== TESTE QUI-QUADRADO ===")
+    print(teste_qui_quadrado)
+    cat("\n\n")
+
+    # GRÁFICO
+    ggplot(tabela_trabalha_vs_consumo, aes(x = Trabalha, y = Quantidade, fill = RespondenteIngere)) +
+      # position="fill" cria as barras de 100%
+      geom_bar(stat = "identity", position = "fill", alpha = 0.8) +
+      # Adiciona os rótulos de percentual no meio de cada segmento da barra
+      geom_text(
+        aes(label = Percentual),
+        position = position_fill(vjust = 0.5), # Centraliza o texto no segmento
+        color = "white",
+        size = 4
+      ) +
+      # Inverte a ordem das cores para "Sim" ficar em cima (opcional)
+      scale_fill_discrete(direction = -1) +
+      # Formata o eixo y para mostrar percentuais
+      scale_y_continuous(labels = scales::percent) +
+      labs(
+        title = "Proporção de Consumo de Álcool por respondentes que trabalham",
+        x = "Trabalha",
+        y = "Percentual",
+        fill = "Consome Álcool?" # Muda o título da legenda
+      ) +
+      theme_minimal(base_size = 14)
+
+
+    # TABELA
+    cat("\n\n### Tabela de Cruzamento: Trabalha vs. Consumo de Álcool\n")
+    knitr::kable(
+      tabela_trabalha_vs_consumo,
+      caption = "Tabela de cruzamento mostrando a quantidade e o percentual de consumo por respondentes que trabalham."
+    )
+    ```
+
+Eixo 02: Padrão de consumo (Demografia vs. Comportamento)
+
+-   Sexo vs. Tipo que toma
+
+    Verificamos a preferência por um tipo de bebida em relação ao gênero.
+
+    ```{r}
+    tabela_sexo_vs_tipo <- dados_brutos %>%
+      filter(!is.na(Sexo) & !is.na(TipoQueToma)) %>%
+      count(Sexo, TipoQueToma) %>%
+      group_by(Sexo) %>%
+      mutate(
+        # Percentual NUMÉRICO: para a altura das barras e cálculos
+        PercentualNumerico = n / sum(n),
+        # Percentual em TEXTO: para os rótulos do gráfico e tabelas
+        PercentualTexto = scales::percent(PercentualNumerico, accuracy = 0.1)
+      ) %>%
+      ungroup() %>%
+      rename(Quantidade = n)
+
+    tabela_contingencia <- dados_brutos %>%
+      count(Sexo, TipoQueToma) %>%
+      tidyr::pivot_wider(names_from = TipoQueToma, values_from = n, values_fill = 0)
+
+    teste_qui_quadrado <- chisq.test(tabela_contingencia[, -1])
+    cat("--- Teste Qui-Quadrado de Independência ---\n\n")
+    print(teste_qui_quadrado)
+    cat("\n\n")
+
+
+    ggplot(tabela_sexo_vs_tipo, aes(x = TipoQueToma, y = PercentualNumerico, fill = Sexo)) +
+      geom_bar(stat = "identity", position = "dodge", alpha = 0.8) +
+      # O rótulo usa a coluna de TEXTO
+      geom_text(
+        aes(label = PercentualTexto),
+        position = position_dodge(width = 0.9),
+        vjust = -0.5,
+        size = 3.5
+      ) +
+      # O eixo y é formatado a partir dos dados NUMÉRICOS
+      scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+      scale_fill_brewer(palette = "Set2") +
+      labs(
+        title = "Preferência por Tipo de Bebida entre os Sexos",
+        x = "Tipo de Bebida",
+        y = "Percentual de Preferência (dentro de cada sexo)",
+        fill = "Sexo"
+      ) +
+      theme_minimal(base_size = 9)
+
+
+    tabela_para_exibir <- tabela_sexo_vs_tipo %>%
+      select(Sexo, `Tipo de Bebida` = TipoQueToma, Quantidade, Percentual = PercentualTexto)
+
+    cat("\n\n### Tabela de Cruzamento: Sexo vs. Tipo de Bebida\n")
+    knitr::kable(
+      tabela_para_exibir,
+      caption = "Tabela de cruzamento mostrando a preferência por tipo de bebida dentro de cada sexo."
+    )
+    ```
+
+-   Renda Familiar vs. Tipo que toma
+
+    Análise da relaçao entre a renda familiar do respondente e o tipo de bebida que consome
+
+    ```{r}
+    tabela_renda_vs_tipo <- dados_brutos %>%
+      filter(!is.na(RendaFamiliar) & !is.na(TipoQueToma)) %>%
+      count(RendaFamiliar, TipoQueToma) %>%
+      group_by(RendaFamiliar) %>%
+      mutate(
+        # Percentual NUMÉRICO: para a altura das barras e cálculos
+        PercentualNumerico = n / sum(n),
+        # Percentual em TEXTO: para os rótulos do gráfico e tabelas
+        PercentualTexto = scales::percent(PercentualNumerico, accuracy = 0.1)
+      ) %>%
+      ungroup() %>%
+      rename(Quantidade = n)
+
+    tabela_contingencia <- dados_brutos %>%
+      count(RendaFamiliar, TipoQueToma) %>%
+      tidyr::pivot_wider(names_from = TipoQueToma, values_from = n, values_fill = 0)
+
+    teste_qui_quadrado <- chisq.test(tabela_contingencia[, -1])
+    cat("--- Teste Qui-Quadrado de Independência ---\n\n")
+    print(teste_qui_quadrado)
+    cat("\n\n")
+
+
+    ggplot(tabela_renda_vs_tipo, aes(x = TipoQueToma, y = PercentualNumerico, fill = RendaFamiliar)) +
+      geom_bar(stat = "identity", position = "dodge", alpha = 0.8) +
+      # O rótulo usa a coluna de TEXTO
+      geom_text(
+        aes(label = PercentualTexto),
+        position = position_dodge(width = 0.9),
+        vjust = -0.5,
+        size = 3.5
+      ) +
+      # O eixo y é formatado a partir dos dados NUMÉRICOS
+      scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+      scale_fill_brewer(palette = "Set2") +
+      labs(
+        title = "Preferência por Tipo de Bebida entre as diferentes rendas",
+        x = "Tipo de Bebida",
+        y = "Percentual de Preferência (dentro de cada renda)",
+        fill = "RendaFamiliar"
+      ) +
+      theme_minimal(base_size = 8)
+
+
+    tabela_para_exibir <- tabela_renda_vs_tipo %>%
+      select(RendaFamiliar, `Tipo de Bebida` = TipoQueToma, Quantidade, Percentual = PercentualTexto)
+
+    cat("\n\n### Tabela de Cruzamento: Renda Familiar vs. Tipo de Bebida\n")
+    knitr::kable(
+      tabela_para_exibir,
+      caption = "Tabela de cruzamento mostrando a preferência por tipo de bebida dentro de cada nível de renda familiar"
+    )
+    ```
+
+-   Faixa etária vs. Frequência
+
+    Analisamos se a faixa etária do respondente interfere em seu comportamento no consumo de bebidas alcoólicas
+
+    ```{r}
+    tabela_faixaEtaria_vs_frequencia <- dados_brutos %>%
+      filter(!is.na(FaixaEtaria) & !is.na(Frequencia)) %>%
+      count(FaixaEtaria, Frequencia) %>%
+      group_by(FaixaEtaria) %>%
+      mutate(
+        # Percentual NUMÉRICO: para a altura das barras e cálculos
+        PercentualNumerico = n / sum(n),
+        # Percentual em TEXTO: para os rótulos do gráfico e tabelas
+        PercentualTexto = scales::percent(PercentualNumerico, accuracy = 0.1)
+      ) %>%
+      ungroup() %>%
+      rename(Quantidade = n)
+
+    tabela_contingencia <- dados_brutos %>%
+      count(FaixaEtaria, Frequencia) %>%
+      tidyr::pivot_wider(names_from = Frequencia, values_from = n, values_fill = 0)
+
+    teste_qui_quadrado <- chisq.test(tabela_contingencia[, -1])
+    cat("--- Teste Qui-Quadrado de Independência ---\n\n")
+    print(teste_qui_quadrado)
+    cat("\n\n")
+
+
+    ggplot(tabela_faixaEtaria_vs_frequencia, aes(x = Frequencia, y = PercentualNumerico, fill = FaixaEtaria)) +
+      geom_bar(stat = "identity", position = "dodge", alpha = 0.8) +
+      # O rótulo usa a coluna de TEXTO
+      geom_text(
+        aes(label = PercentualTexto),
+        position = position_dodge(width = 0.9),
+        vjust = -0.5,
+        size = 3.5
+      ) +
+      # O eixo y é formatado a partir dos dados NUMÉRICOS
+      scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+      scale_fill_brewer(palette = "Set2") +
+      labs(
+        title = "Frequência de consumo entre as diferentes faixa etárias",
+        x = "Frequência",
+        y = "Percentual de frequência dentro de cada faixa etária",
+        fill = "FaixaEtaria"
+      ) +
+      theme_minimal(base_size = 7)
+
+
+    tabela_para_exibir <- tabela_faixaEtaria_vs_frequencia %>%
+      select(FaixaEtaria, `Frequencia` = Frequencia, Quantidade, Percentual = PercentualTexto)
+
+    knitr::kable(
+      tabela_para_exibir,
+      caption = "Tabela de cruzamento mostrando a frequância de consumo em diferentes faixa etárias"
+    )
+    ```
+
+-   Com quem mora vs. Frequência
+
+    Analisamos se as pessoas que residem com o respondente podem interferiar em seu padrão de consumo
+
+    ```{r}
+    tabela_moradia_vs_frequencia <- dados_brutos %>%
+      filter(!is.na(MoraComQuem) & !is.na(Frequencia)) %>%
+      count(MoraComQuem, Frequencia) %>%
+      group_by(MoraComQuem) %>%
+      mutate(
+        # Percentual NUMÉRICO: para a altura das barras e cálculos
+        PercentualNumerico = n / sum(n),
+        # Percentual em TEXTO: para os rótulos do gráfico e tabelas
+        PercentualTexto = scales::percent(PercentualNumerico, accuracy = 0.1)
+      ) %>%
+      ungroup() %>%
+      rename(Quantidade = n)
+
+    tabela_contingencia <- dados_brutos %>%
+      count(MoraComQuem, Frequencia) %>%
+      tidyr::pivot_wider(names_from = Frequencia, values_from = n, values_fill = 0)
+
+    teste_qui_quadrado <- chisq.test(tabela_contingencia[, -1])
+    cat("--- Teste Qui-Quadrado de Independência ---\n\n")
+    print(teste_qui_quadrado)
+    cat("\n\n")
+
+
+    ggplot(tabela_moradia_vs_frequencia, aes(x = Frequencia, y = PercentualNumerico, fill = MoraComQuem)) +
+      geom_bar(stat = "identity", position = "dodge", alpha = 0.8) +
+      # O rótulo usa a coluna de TEXTO
+      geom_text(
+        aes(label = PercentualTexto),
+        position = position_dodge(width = 0.9),
+        vjust = -0.5,
+        size = 3.5
+      ) +
+      # O eixo y é formatado a partir dos dados NUMÉRICOS
+      scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+      scale_fill_brewer(palette = "Set2") +
+      labs(
+        title = "Frequência de consumo entre as diferentes relaçoes de moradia",
+        x = "Frequência",
+        y = "Percentual de frequência dentro de cada relação de moradia",
+        fill = "MoraComQuem"
+      ) +
+      theme_minimal(base_size = 8)
+
+
+    tabela_para_exibir <- tabela_moradia_vs_frequencia %>%
+      select(MoraComQuem, `Frequencia` = Frequencia, Quantidade, Percentual = PercentualTexto)
+
+    knitr::kable(
+      tabela_para_exibir,
+      caption = "Tabela de cruzamento mostrando a frequância de consumo em diferentes relações de moradia"
+    )
+    ```
+
+Eixo 03: Influências (Causas do comportamento)
+
+-   Imagem que causa vs. Frequência
+
+    Analisamos se a imagem que os respondentes tem em relação a bebida interfere na frequência de consumo deles
+
+    ```{r}
+    tabela_imagem_vs_frequencia <- dados_brutos %>%
+      filter(!is.na(ImagemQueCausa) & !is.na(Frequencia)) %>%
+      count(ImagemQueCausa, Frequencia) %>%
+      group_by(ImagemQueCausa) %>%
+      mutate(
+        # Percentual NUMÉRICO: para a altura das barras e cálculos
+        PercentualNumerico = n / sum(n),
+        # Percentual em TEXTO: para os rótulos do gráfico e tabelas
+        PercentualTexto = scales::percent(PercentualNumerico, accuracy = 0.1)
+      ) %>%
+      ungroup() %>%
+      rename(Quantidade = n)
+
+    tabela_contingencia <- dados_brutos %>%
+      count(ImagemQueCausa, Frequencia) %>%
+      tidyr::pivot_wider(names_from = Frequencia, values_from = n, values_fill = 0)
+
+    teste_qui_quadrado <- chisq.test(tabela_contingencia[, -1])
+    cat("--- Teste Qui-Quadrado de Independência ---\n\n")
+    print(teste_qui_quadrado)
+    cat("\n\n")
+
+
+    ggplot(tabela_imagem_vs_frequencia, aes(x = Frequencia, y = PercentualNumerico, fill = ImagemQueCausa)) +
+      geom_bar(stat = "identity", position = "dodge", alpha = 0.8) +
+      # O rótulo usa a coluna de TEXTO
+      geom_text(
+        aes(label = PercentualTexto),
+        position = position_dodge(width = 0.9),
+        vjust = -0.5,
+        size = 3.5
+      ) +
+      # O eixo y é formatado a partir dos dados NUMÉRICOS
+      scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+      scale_fill_brewer(palette = "Set2") +
+      labs(
+        title = "Frequência de consumo entre as diferentes percepções de imagem em relação ao álcool",
+        x = "Frequência",
+        y = "Percentual de frequência dentro de cada percepção de imagem",
+        fill = "ImagemQueCausa"
+      ) +
+      theme_minimal(base_size = 7)
+
+
+    tabela_para_exibir <- tabela_imagem_vs_frequencia %>%
+      select(ImagemQueCausa, `Frequencia` = Frequencia, Quantidade, Percentual = PercentualTexto)
+
+    knitr::kable(
+      tabela_para_exibir,
+      caption = "Tabela de cruzamento mostrando a frequância de consumo em diferentes percepções de imagem em relação ao álcool"
+    )
+    ```
+
+-   Motivo de ter começado a ingerir vs. Idade que começou
+
+    É analisado se por exemplo, pessoas que começaram a consumir por incentivo de amigos iniciarão antes do que os de iniciativa própria
+
+    ```{r}
+
+    # Bloco de Preparação: Ordenando a variável 'IdadeQueComecou'
+
+    # 1. Crie um vetor com a ordem correta dos níveis
+    niveis_idade_inicio <- c(
+      "Menos de 12 anos",
+      "12 a 14 anos",
+      "15 a 17 anos",
+      "18 a 20 anos",
+      "21 a 25 anos",
+      "Comecei a consumir álcool recentemente (nos últimos 6 meses)",
+      "Outra",
+      "Não consumo bebidas alcoólicas"
+    )
+
+    # 2. Aplique esta ordem à sua coluna no data frame principal
+    dados_brutos <- dados_brutos %>%
+      mutate(IdadeQueComecou = factor(IdadeQueComecou, levels = niveis_idade_inicio))
+
+    tabela_motivo_vs_idade <- dados_brutos %>%
+      filter(!is.na(MotivoDoComecoNoAlcool) & !is.na(IdadeQueComecou)) %>%
+      count(MotivoDoComecoNoAlcool, IdadeQueComecou) %>%
+      group_by(IdadeQueComecou) %>%
+      mutate(
+        # Percentual NUMÉRICO: para a altura das barras e cálculos
+        PercentualNumerico = n / sum(n),
+        # Percentual em TEXTO: para os rótulos do gráfico e tabelas
+        PercentualTexto = scales::percent(PercentualNumerico, accuracy = 0.1)
+      ) %>%
+      ungroup() %>%
+      rename(Quantidade = n)
+
+    tabela_contingencia <- dados_brutos %>%
+      count(MotivoDoComecoNoAlcool, IdadeQueComecou) %>%
+      tidyr::pivot_wider(names_from = IdadeQueComecou, values_from = n, values_fill = 0)
+
+    teste_qui_quadrado <- chisq.test(tabela_contingencia[, -1])
+    cat("--- Teste Qui-Quadrado de Independência ---\n\n")
+    print(teste_qui_quadrado)
+    cat("\n\n")
+
+
+    ggplot(tabela_motivo_vs_idade, aes(x = IdadeQueComecou, y = PercentualNumerico, fill = MotivoDoComecoNoAlcool)) +
+      geom_bar(stat = "identity", position = "dodge", alpha = 0.8) +
+      # O rótulo usa a coluna de TEXTO
+      geom_text(
+        aes(label = PercentualTexto),
+        position = position_dodge(width = 0.9),
+        vjust = -0.5,
+        size = 2.5 # Diminuí um pouco o tamanho para não poluir
+      ) +
+      # O eixo y é formatado a partir dos dados NUMÉRICOS
+      scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+      scale_fill_brewer(palette = "Set2") +
+      labs(
+        title = "Relação entre Motivo e Idade de Início do Consumo",
+        x = "Idade de Início do Consumo",
+        y = "Percentual (dentro de cada faixa etária)",
+        fill = "Motivo do Início"
+      ) +
+      theme_minimal(base_size = 7) + # Aumentei um pouco a fonte base
+      
+      # --- LINHA ADICIONADA PARA CORRIGIR A SOBREPOSIÇÃO ---
+      theme(axis.text.x = element_text(angle = 50, hjust = 1))
+
+
+    tabela_para_exibir <- tabela_motivo_vs_idade %>%
+      select(MotivoDoComecoNoAlcool, `IdadeQueComecou` = IdadeQueComecou, Quantidade, Percentual = PercentualTexto)
+
+    knitr::kable(
+      tabela_para_exibir,
+      caption = "Tabela de cruzamento mostrando o motivo do por que ter começado a ingerir bebida alcoólica e a idade em que iniciou"
+    )
+    ```
+
+Eixo 04: Riscos e consequências
+
+A relação entre os impactos negativos e o comportamento de consumo
+
+-    Foi protagonista de vexame por causa do álcool vs. Frequência
+
+    ```{r}
+    # --- Eixo 4: Riscos e Consequências ---
+    # Hipótese: A frequência de consumo está associada à probabilidade de passar por vexames.
+
+    # --- PASSO 1: CÁLCULO (com a perspectiva invertida) ---
+    tabela_frequencia_vs_vexame <- dados_brutos %>%
+      filter(!is.na(DeuVexamePorCausaDaBebida) & !is.na(Frequencia)) %>%
+      # A mudança crucial está aqui: agrupamos pela FREQUÊNCIA
+      group_by(Frequencia) %>%
+      # Contamos as combinações DENTRO de cada grupo de frequência
+      count(DeuVexamePorCausaDaBebida) %>%
+      mutate(
+        PercentualNumerico = n / sum(n),
+        PercentualTexto = scales::percent(PercentualNumerico, accuracy = 0.1)
+      ) %>%
+      ungroup() %>%
+      rename(Quantidade = n)
+
+    # --- PASSO 2: TESTE ESTATÍSTICO (O código não muda) ---
+    tabela_contingencia <- dados_brutos %>%
+      count(DeuVexamePorCausaDaBebida, Frequencia) %>%
+      tidyr::pivot_wider(names_from = Frequencia, values_from = n, values_fill = 0)
+    teste_qui_quadrado <- chisq.test(tabela_contingencia[, -1])
+    cat("--- Teste Qui-Quadrado de Independência ---\n\n")
+    print(teste_qui_quadrado)
+    cat("\n\n")
+
+    # --- PASSO 3: GRÁFICO (Adaptado para a nova perspectiva) ---
+    # O gráfico de barras 100% empilhadas é ideal aqui
+    cat("### Gráfico: Risco de Vexame por Frequência de Consumo\n")
+    ggplot(tabela_frequencia_vs_vexame, aes(x = Frequencia, y = Quantidade, fill = DeuVexamePorCausaDaBebida)) +
+      geom_bar(stat = "identity", position = "fill", alpha = 0.8) +
+      geom_text(
+        aes(label = PercentualTexto),
+        position = position_fill(vjust = 0.5),
+        color = "white",
+        size = 4
+      ) +
+      scale_y_continuous(labels = scales::percent) +
+      scale_fill_brewer(palette = "Paired", direction = -1) + # Nova paleta de cores
+      labs(
+        title = "Probabilidade de 'Dar Vexame' por Frequência de Consumo",
+        x = "Frequência de Consumo de Álcool",
+        y = "Proporção de Respostas",
+        fill = "Já Deu Vexame?"
+      ) +
+      theme_minimal(base_size = 14) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+    # --- PASSO 4: TABELA (Permanece igual) ---
+    # A tabela de cruzamento original ainda é útil para ver os números brutos
+    knitr::kable(
+      tabela_frequencia_vs_vexame,
+      caption = "Tabela de cruzamento mostrando o risco de vexame por frequência de consumo."
+    )
+    ```
+
+-   Pegou carona com alguém sob efeito de álcool vs. Dirigiu sob efeito de álcool
+
+    É análisado se o comportamento de pegar uma carona com alguém sob efeito de álcool instiga as pessoas que consomem a também dirigem sob efeito.
+
+    ```{r}
+    # --- Eixo 4: Riscos e Consequências ---
+    # Hipótese: O comportamento de dirigir alcoolizado está associado ao de aceitar carona de risco.
+
+    # --- PASSO 1: CÁLCULO ---
+    # Vamos agrupar por quem já dirigiu alcoolizado para ver, dentro desse grupo,
+    # a proporção de quem também já pegou carona de risco.
+
+    tabela_riscos_cruzados <- dados_consumidores %>%
+      filter(!is.na(DirigiuSobEfeitoDoAlcool) & !is.na(PegouCaronaComAlguemSobEfeitoDaBebida)) %>%
+      # A linha abaixo exclui possíveis respostas "Não se aplica" ou "Não consumo" que possam ter sobrado
+      filter(DirigiuSobEfeitoDoAlcool %in% c("Sim", "Não") & PegouCaronaComAlguemSobEfeitoDaBebida %in% c("Sim", "Não")) %>%
+      
+      group_by(DirigiuSobEfeitoDoAlcool) %>%
+      count(PegouCaronaComAlguemSobEfeitoDaBebida) %>%
+      mutate(
+        PercentualNumerico = n / sum(n),
+        PercentualTexto = scales::percent(PercentualNumerico, accuracy = 0.1)
+      ) %>%
+      ungroup() %>%
+      rename(Quantidade = n)
+
+
+    # --- PASSO 2: TESTE ESTATÍSTICO ---
+    tabela_contingencia <- dados_consumidores %>%
+      filter(DirigiuSobEfeitoDoAlcool %in% c("Sim", "Não") & PegouCaronaComAlguemSobEfeitoDaBebida %in% c("Sim", "Não")) %>%
+      count(DirigiuSobEfeitoDoAlcool, PegouCaronaComAlguemSobEfeitoDaBebida) %>%
+      tidyr::pivot_wider(names_from = PegouCaronaComAlguemSobEfeitoDaBebida, values_from = n, values_fill = 0)
+
+    teste_qui_quadrado <- chisq.test(tabela_contingencia[, -1])
+    cat("--- Teste Qui-Quadrado de Independência ---\n\n")
+    print(teste_qui_quadrado)
+    cat("\n\n")
+
+
+    # --- PASSO 3: VISUALIZAÇÃO GRÁFICA ---
+    cat("### Gráfico: Associação entre Comportamentos de Risco\n")
+    ggplot(tabela_riscos_cruzados, aes(x = DirigiuSobEfeitoDoAlcool, y = Quantidade, fill = PegouCaronaComAlguemSobEfeitoDaBebida)) +
+      geom_bar(stat = "identity", position = "fill", alpha = 0.8) +
+      geom_text(
+        aes(label = PercentualTexto),
+        position = position_fill(vjust = 0.5),
+        color = "black",
+        size = 4,
+        fontface = "bold"
+      ) +
+      scale_y_continuous(labels = scales::percent) +
+      # Paleta de cores para Risco (Sim = Vermelho, Não = Verde)
+      scale_fill_manual(
+        values = c("Não" = "#2ECC71", "Sim" = "#E74C3C"), 
+        name = "Pegou Carona de Risco?"
+      ) +
+      labs(
+        title = "Relação entre Dirigir Alcoolizado e Aceitar Carona de Risco",
+        subtitle = "Comparando a proporção de quem aceita carona entre os que dirigem ou não sob efeito de álcool.",
+        x = "Já Dirigiu Sob Efeito de Álcool?",
+        y = "Proporção de Respostas"
+      ) +
+      theme_minimal(base_size = 14) +
+      coord_flip() # Vira o gráfico para melhor leitura dos eixos
+
+
+    # --- PASSO 4: TABELA FORMATADA ---
+    cat("\n\n### Tabela de Cruzamento: Comportamentos de Risco Cruzados\n")
+    # Renomeando colunas para a tabela final ficar mais clara
+    tabela_para_exibir <- tabela_riscos_cruzados %>%
+      rename(
+        `Dirigiu Alcoolizado?` = DirigiuSobEfeitoDoAlcool,
+        `Pegou Carona de Risco?` = PegouCaronaComAlguemSobEfeitoDaBebida,
+        Percentual = PercentualTexto
+      )
+
+    knitr::kable(
+      tabela_para_exibir,
+      caption = "Tabela de cruzamento entre o hábito de dirigir alcoolizado e o de aceitar carona de risco."
+    )
+    ```
+
+-   Respondente ingere vs. Dirigiu sob efeito de álcool
+
+    Analisamos a proporção entre as pessoas que ingerem álcool e já dirigiram sob o efeito dele
+
+    ```{r}
+
+    tabela_risco_dirigir <- dados_consumidores %>%
+      filter(!is.na(DirigiuSobEfeitoDoAlcool) & DirigiuSobEfeitoDoAlcool %in% c("Sim", "Não")) %>%
+      
+      count(DirigiuSobEfeitoDoAlcool, sort = TRUE) %>%
+      mutate(
+        PercentualNumerico = n / sum(n),
+        PercentualTexto = scales::percent(PercentualNumerico, accuracy = 0.1)
+      ) %>%
+      rename(Resposta = DirigiuSobEfeitoDoAlcool, Quantidade = n)
+
+    cat("### Gráfico: Proporção de Consumidores que Já Dirigiram Alcoolizados\n")
+    ggplot(tabela_risco_dirigir, aes(x = Resposta, y = Quantidade, fill = Resposta)) +
+      geom_bar(stat = "identity", alpha = 0.8) +
+      # Usamos show.legend = FALSE para remover a legenda, pois ela é redundante com o eixo x
+      geom_text(
+        aes(label = paste0(Quantidade, " (", PercentualTexto, ")")),
+        vjust = -0.7, # Posição do texto um pouco acima da barra
+        color = "black",
+        size = 4
+      ) +
+      scale_fill_manual(values = c("Não" = "#2ECC71", "Sim" = "#E74C3C")) +
+      labs(
+        title = "Proporção de Consumidores que Já Dirigiram Sob Efeito de Álcool",
+        x = "Resposta",
+        y = "Número de Respondentes"
+      ) +
+      theme_minimal(base_size = 8) +
+      theme(legend.position = "none")
+
+
+    cat("\n\n### Tabela: Proporção de Consumidores que Já Dirigiram Alcoolizados\n")
+    knitr::kable(
+      tabela_risco_dirigir,
+      caption = "Distribuição de respondentes consumidores de álcool segundo o hábito de dirigir após beber."
+    )
+
+    ```
+
+#### Análise numérica descritiva
+
+Mudanças necessárias para que faixa etária se torne numérica
+
+```{r}
+# Carregar os pacotes necessários
+library(stringr)
+
+# Recalcula o data frame usando a correção rowwise()
+dados_com_idade_numerica <- dados_brutos %>%
+  rowwise() %>% # <-- A correção
+  mutate(
+    IdadeNumerica = case_when(
+      str_detect(FaixaEtaria, "Menos de") ~ 17.0,
+      str_detect(FaixaEtaria, "Acima de") ~ 41.0,
+      str_detect(FaixaEtaria, " a ") ~ {
+        numeros <- as.numeric(unlist(str_extract_all(FaixaEtaria, "\\d+")))
+        mean(numeros, na.rm = TRUE)
+      },
+      TRUE ~ NA_real_
+    )
+  ) %>%
+  ungroup() %>%
+  filter(!is.na(IdadeNumerica))
+
+# Este bloco usa o objeto recém-criado para mostrar o mapeamento
+tabela_mapeamento_idade <- dados_com_idade_numerica %>%
+  select(FaixaEtaria, IdadeNumerica) %>%
+  distinct() %>%
+  arrange(IdadeNumerica) %>%
+  rename(
+    `Faixa Etária Original` = FaixaEtaria,
+    `Valor Numérico Atribuído` = IdadeNumerica
+  )
+
+# Apresenta a tabela, que agora estará correta
+knitr::kable(
+  tabela_mapeamento_idade,
+  caption = "Mapeamento das Faixas Etárias para Valores Numéricos (Versão Corrigida)"
+)
+```
+
+Cálculo estatística descritiva
+
+```{r}
+# Cálculo da Média, Mediana e Quartis
+estatisticas_idade <- dados_com_idade_numerica %>%
+  summarise(
+    Media = mean(IdadeNumerica),
+    Mediana = median(IdadeNumerica),
+    Q1 = quantile(IdadeNumerica, 0.25),
+    Q3 = quantile(IdadeNumerica, 0.75),
+    IIQ = Q3 - Q1
+  )
+
+# Cálculo da Moda (o valor mais frequente)
+moda_idade <- dados_com_idade_numerica %>%
+  count(IdadeNumerica, sort = TRUE) %>%
+  # Pega o primeiro valor da tabela ordenada, que é o mais frequente
+  slice(1) %>%
+  pull(IdadeNumerica)
+
+# Apresentar os resultados de forma organizada
+cat("--- Análise Descritiva da Idade dos Respondentes ---\n")
+cat(sprintf("Média de Idade: %.2f anos\n", estatisticas_idade$Media))
+cat(sprintf("Mediana (idade central): %.2f anos\n", estatisticas_idade$Mediana))
+cat(sprintf("Moda (idade mais comum): %.2f anos\n", moda_idade))
+cat("\n--- Quartis ---\n")
+cat(sprintf("Primeiro Quartil (Q1 - 25%% mais novos): %.2f anos\n", estatisticas_idade$Q1))
+cat(sprintf("Terceiro Quartil (Q3 - 75%% mais novos): %.2f anos\n", estatisticas_idade$Q3))
+cat(sprintf("Intervalo Interquartil (IIQ - 50%% centrais): %.2f anos\n", estatisticas_idade$IIQ))
+```
+
+Boxpl
+
+```{r}
+ggplot(dados_com_idade_numerica, aes(x = "", y = IdadeNumerica)) + # x="" cria um boxplot vertical único
+  geom_boxplot(fill = "lightblue", width = 0.5) +
+  # Adiciona os pontos de dados individuais de forma transparente para ver a distribuição
+  geom_jitter(width = 0.1, alpha = 0.4) +
+  coord_flip() + # Deita o boxplot na horizontal
+  labs(
+    title = "Boxplot da Idade dos Respondentes",
+    x = "", # Remove o rótulo do eixo x
+    y = "Idade (ponto médio da faixa)"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank()) # Remove o texto do eixo y
+```
