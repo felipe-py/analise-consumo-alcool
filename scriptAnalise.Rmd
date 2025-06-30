@@ -18,7 +18,7 @@ library(scales)
 
 Regras para que a exportação do script em .tex funcione corretamente.
 
-```{r}
+```{'{r}
 knitr::opts_chunk$set(
   echo = FALSE,      # (A OPÇÃO MAIS IMPORTANTE) NÃO mostra o seu código R no output.
   message = FALSE,   # NÃO mostra mensagens de status (ex: a mensagem do tidyverse ao carregar).
@@ -26,7 +26,7 @@ knitr::opts_chunk$set(
   fig.align = "center", # (Bônus) Centraliza todas as figuras e gráficos.
   fig.width = 8,       # (Bônus) Define uma largura padrão para as figuras.
   fig.height = 6       # (Bônus) Define uma altura padrão para as figuras.
-)
+)'''
 ```
 
 #### Chamada da base de dados
@@ -1453,6 +1453,9 @@ knitr::kable(
     É análisado se o comportamento de pegar uma carona com alguém sob efeito de álcool instiga as pessoas que consomem a também dirigem sob efeito.
 
     ```{r}
+    dados_consumidores <- dados_brutos %>%
+      filter(RespondenteIngere == "Sim")
+
     tabela_carona_vs_dirigir <- dados_consumidores %>%
       filter(DirigiuSobEfeitoDoAlcool %in% c("Sim", "Não") & PegouCaronaComAlguemSobEfeitoDaBebida %in% c("Sim", "Não")) %>%
       
@@ -1508,6 +1511,25 @@ knitr::kable(
     Analisamos a proporção entre as pessoas que ingerem álcool e já dirigiram sob o efeito dele
 
     ```{r}
+
+    dados_consumidores <- dados_brutos %>%
+      filter(RespondenteIngere == "Sim")
+
+    niveis_idade_inicio <- c("Menos de 12 anos", "12 a 14 anos", "15 a 17 anos", "18 a 20 anos", "21 a 25 anos", "Comecei a consumir álcool recentemente (nos últimos 6 meses)", "Outra")
+    niveis_frequencia <- c("Fins de semana", "Três vezes ao mês", "Duas vezes ao mês", "Só em festas", "Outra", "Não consumo bebidas alcoólicas")
+
+    dados_brutos <- dados_brutos %>%
+      mutate(
+        IdadeQueComecou = factor(IdadeQueComecou, levels = niveis_idade_inicio),
+        Frequencia = factor(Frequencia, levels = niveis_frequencia)
+      )
+
+    dados_consumidores <- dados_consumidores %>%
+      mutate(
+        IdadeQueComecou = factor(IdadeQueComecou, levels = niveis_idade_inicio),
+        Frequencia = factor(Frequencia, levels = niveis_frequencia)
+      )
+
     # --- CÁLCULO
     tabela_risco_dirigir <- dados_consumidores %>%
       filter(!is.na(DirigiuSobEfeitoDoAlcool) & DirigiuSobEfeitoDoAlcool %in% c("Sim", "Não")) %>%
