@@ -1,16 +1,32 @@
 ---
-title: "Análise do Consumo de álcool entre estudantes da UEFS"
-output: html_notebook
+title: "Análise de Consumo de Álcool entre estudantes da UEFS"
+output:
+  html_document:
+    df_print: paged
+  pdf_document:
+    keep_tex: true
 ---
 
 #### Chamada das bibliotecas
 
 ```{r}
-library(readxl)   # Para ler arquivos Excel (função read_excel)
-library(dplyr)    # Para manipular dados (funções filter, mutate, group_by, summarise)
-library(ggplot2)  # Para criar os gráficos
+library(readxl)   
+library(dplyr)    
+library(ggplot2)  
 library(scales)
+```
 
+Regras para que a exportação do script em .tex funcione corretamente.
+
+```{r}
+knitr::opts_chunk$set(
+  echo = FALSE,      # (A OPÇÃO MAIS IMPORTANTE) NÃO mostra o seu código R no output.
+  message = FALSE,   # NÃO mostra mensagens de status (ex: a mensagem do tidyverse ao carregar).
+  warning = FALSE,   # NÃO mostra mensagens de aviso (ex: o aviso do teste Qui-Quadrado).
+  fig.align = "center", # (Bônus) Centraliza todas as figuras e gráficos.
+  fig.width = 8,       # (Bônus) Define uma largura padrão para as figuras.
+  fig.height = 6       # (Bônus) Define uma altura padrão para as figuras.
+)
 ```
 
 #### Chamada da base de dados
@@ -397,7 +413,7 @@ ggplot(tabela_sexo, aes(x = reorder(`Sexo do Respondente`, -Quantidade), y = Qua
       geom_bar(stat = "identity", fill = "#5DADE2", alpha = 0.8) +
       geom_text(aes(label = paste0(Quantidade, "\n(", Percentual, ")")), vjust = 1.5, color = "white", size = 4) +
       labs(title = "A bebida alcoólica é importante na sua vida?", x = NULL, y = "Número de Respostas") +
-      theme_minimal(base_size = 14)
+      theme_minimal(base_size = 16)
     ```
 
 -   Família ingere bebida alcoólica
@@ -449,6 +465,25 @@ ggplot(tabela_sexo, aes(x = reorder(`Sexo do Respondente`, -Quantidade), y = Qua
 -   Idade que começou a consumir
 
     ```{r}
+    # Este código deve estar no seu bloco de preparação de dados
+    niveis_idade_inicio <- c(
+      "Menos de 12 anos",
+      "12 a 14 anos",
+      "15 a 17 anos",
+      "18 a 20 anos",
+      "21 a 25 anos",
+      "Comecei a consumir álcool recentemente (nos últimos 6 meses)",
+      "Outra",
+      "Não consumo bebidas alcoólicas"
+    )
+
+    # Aplica a ordenação ao data frame
+    dados_brutos <- dados_brutos %>%
+      mutate(IdadeQueComecou = factor(IdadeQueComecou, levels = niveis_idade_inicio))
+
+    # --- Análise Univariada: Idade de Início do Consumo ---
+
+    # 1. CÁLCULO (Seu código aqui está perfeito)
     tabela_idade <- dados_brutos %>%
       count(IdadeQueComecou, sort = TRUE) %>%
       mutate(
@@ -459,25 +494,31 @@ ggplot(tabela_sexo, aes(x = reorder(`Sexo do Respondente`, -Quantidade), y = Qua
         Quantidade = n
       )
 
+    # 2. TABELA (Seu código aqui está perfeito)
     knitr::kable(
       tabela_idade,
-      caption = "Idade que comecou"
+      caption = "Idade que começou a consumir"
     )
 
-    ggplot(tabela_idade, aes(x = reorder(`Idade que comecou`, -Quantidade), y = Quantidade)) +
+    # 3. GRÁFICO (Versão Corrigida)
+    ggplot(tabela_idade, aes(x = `Idade que comecou`, y = Quantidade)) + # <-- MUDANÇA 1: reorder() removido
       geom_bar(stat = "identity", fill = "#5DADE2", alpha = 0.8) +
       geom_text(
         aes(label = paste0(Quantidade, "\n(", Percentual, ")")),
         vjust = 1.5,
         color = "white",
-        size = 4
+        size = 4,
+        fontface = "bold"
       ) +
       labs(
-        title = "Idade que comecou a Ingerir",
-        x = NULL,
-        y = "Número de Respostas"
+        title = "Idade de Início do Consumo de Bebida Alcoólica",
+        x = "Idade de Início", # Rótulo do eixo X mais limpo
+        y = "Número de Respondentes"
       ) +
-      theme_minimal(base_size = 4)
+      theme_minimal(base_size = 9) +
+      
+      # --- MUDANÇA 2: Linha adicionada para girar o texto do eixo X ---
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
     ```
 
 -   Quantidade de copos por dia
@@ -752,9 +793,7 @@ ggplot(tabela_sexo, aes(x = reorder(`Sexo do Respondente`, -Quantidade), y = Qua
         color = "white",
         size = 4
       ) +
-      # Inverte a ordem das cores para "Sim" ficar em cima (opcional)
       scale_fill_discrete(direction = -1) +
-      # Formata o eixo y para mostrar percentuais
       scale_y_continuous(labels = scales::percent) +
       labs(
         title = "Proporção de Consumo de Álcool por Sexo",
@@ -806,9 +845,7 @@ ggplot(tabela_sexo, aes(x = reorder(`Sexo do Respondente`, -Quantidade), y = Qua
         color = "white",
         size = 4
       ) +
-      # Inverte a ordem das cores para "Sim" ficar em cima (opcional)
       scale_fill_discrete(direction = -1) +
-      # Formata o eixo y para mostrar percentuais
       scale_y_continuous(labels = scales::percent) +
       labs(
         title = "Proporção de Consumo de Álcool por Religião",
@@ -860,9 +897,7 @@ ggplot(tabela_sexo, aes(x = reorder(`Sexo do Respondente`, -Quantidade), y = Qua
         color = "white",
         size = 4
       ) +
-      # Inverte a ordem das cores para "Sim" ficar em cima (opcional)
       scale_fill_discrete(direction = -1) +
-      # Formata o eixo y para mostrar percentuais
       scale_y_continuous(labels = scales::percent) +
       labs(
         title = "Proporção de Consumo de Álcool por Pais que consomem",
@@ -914,9 +949,7 @@ ggplot(tabela_renda_vs_consumo, aes(x = RendaFamiliar, y = Quantidade, fill = Re
     color = "white",
     size = 4
   ) +
-  # Inverte a ordem das cores para "Sim" ficar em cima (opcional)
   scale_fill_discrete(direction = -1) +
-  # Formata o eixo y para mostrar percentuais
   scale_y_continuous(labels = scales::percent) +
   labs(
     title = "Proporção de Consumo de Álcool por Renda",
@@ -968,9 +1001,7 @@ knitr::kable(
         color = "white",
         size = 4
       ) +
-      # Inverte a ordem das cores para "Sim" ficar em cima (opcional)
       scale_fill_discrete(direction = -1) +
-      # Formata o eixo y para mostrar percentuais
       scale_y_continuous(labels = scales::percent) +
       labs(
         title = "Proporção de Consumo de Álcool por respondentes que trabalham",
@@ -1028,7 +1059,7 @@ Eixo 02: Padrão de consumo (Demografia vs. Comportamento)
         vjust = -0.5,
         size = 3.5
       ) +
-      # O eixo y é formatado a partir dos dados NUMÉRICOS
+      
       scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
       scale_fill_brewer(palette = "Set2") +
       labs(
@@ -1087,7 +1118,7 @@ Eixo 02: Padrão de consumo (Demografia vs. Comportamento)
         vjust = -0.5,
         size = 3.5
       ) +
-      # O eixo y é formatado a partir dos dados NUMÉRICOS
+     
       scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
       scale_fill_brewer(palette = "Set2") +
       labs(
@@ -1146,7 +1177,7 @@ Eixo 02: Padrão de consumo (Demografia vs. Comportamento)
         vjust = -0.5,
         size = 3.5
       ) +
-      # O eixo y é formatado a partir dos dados NUMÉRICOS
+      
       scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
       scale_fill_brewer(palette = "Set2") +
       labs(
@@ -1204,7 +1235,7 @@ Eixo 02: Padrão de consumo (Demografia vs. Comportamento)
         vjust = -0.5,
         size = 3.5
       ) +
-      # O eixo y é formatado a partir dos dados NUMÉRICOS
+      #
       scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
       scale_fill_brewer(palette = "Set2") +
       labs(
@@ -1264,7 +1295,7 @@ Eixo 03: Influências (Causas do comportamento)
         vjust = -0.5,
         size = 3.5
       ) +
-      # O eixo y é formatado a partir dos dados NUMÉRICOS
+      
       scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
       scale_fill_brewer(palette = "Set2") +
       labs(
@@ -1291,9 +1322,6 @@ Eixo 03: Influências (Causas do comportamento)
 
     ```{r}
 
-    # Bloco de Preparação: Ordenando a variável 'IdadeQueComecou'
-
-    # 1. Crie um vetor com a ordem correta dos níveis
     niveis_idade_inicio <- c(
       "Menos de 12 anos",
       "12 a 14 anos",
@@ -1371,11 +1399,8 @@ A relação entre os impactos negativos e o comportamento de consumo
 
 -   Foi protagonista de vexame por causa do álcool vs. Frequência
 
-```{{r}}
-# --- Eixo 4: Riscos e Consequências ---
-# Hipótese: A frequência de consumo está associada à probabilidade de passar por vexames.
+```{r}
 
-# --- PASSO 1: CÁLCULO (com a perspectiva invertida) ---
 tabela_frequencia_vs_vexame <- dados_brutos %>%
   filter(!is.na(DeuVexamePorCausaDaBebida) & !is.na(Frequencia)) %>%
   # A mudança crucial está aqui: agrupamos pela FREQUÊNCIA
@@ -1389,7 +1414,6 @@ tabela_frequencia_vs_vexame <- dados_brutos %>%
   ungroup() %>%
   rename(Quantidade = n)
 
-# --- PASSO 2: TESTE ESTATÍSTICO (O código não muda) ---
 tabela_contingencia <- dados_brutos %>%
   count(DeuVexamePorCausaDaBebida, Frequencia) %>%
   tidyr::pivot_wider(names_from = Frequencia, values_from = n, values_fill = 0)
@@ -1398,9 +1422,6 @@ cat("--- Teste Qui-Quadrado de Independência ---\n\n")
 print(teste_qui_quadrado)
 cat("\n\n")
 
-# --- PASSO 3: GRÁFICO (Adaptado para a nova perspectiva) ---
-# O gráfico de barras 100% empilhadas é ideal aqui
-cat("### Gráfico: Risco de Vexame por Frequência de Consumo\n")
 ggplot(tabela_frequencia_vs_vexame, aes(x = Frequencia, y = Quantidade, fill = DeuVexamePorCausaDaBebida)) +
   geom_bar(stat = "identity", position = "fill", alpha = 0.8) +
   geom_text(
@@ -1420,8 +1441,7 @@ ggplot(tabela_frequencia_vs_vexame, aes(x = Frequencia, y = Quantidade, fill = D
   theme_minimal(base_size = 14) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-# --- PASSO 4: TABELA (Permanece igual) ---
-# A tabela de cruzamento original ainda é útil para ver os números brutos
+
 knitr::kable(
   tabela_frequencia_vs_vexame,
   caption = "Tabela de cruzamento mostrando o risco de vexame por frequência de consumo."
@@ -1433,20 +1453,11 @@ knitr::kable(
     É análisado se o comportamento de pegar uma carona com alguém sob efeito de álcool instiga as pessoas que consomem a também dirigem sob efeito.
 
     ```{r}
-    # --- Eixo 4: Riscos e Consequências ---
-    # Hipótese: O comportamento de dirigir alcoolizado está associado ao de aceitar carona de risco.
-
-    # --- PASSO 1: CÁLCULO ---
-    # Vamos agrupar por quem já dirigiu alcoolizado para ver, dentro desse grupo,
-    # a proporção de quem também já pegou carona de risco.
-
-    tabela_riscos_cruzados <- dados_consumidores %>%
-      filter(!is.na(DirigiuSobEfeitoDoAlcool) & !is.na(PegouCaronaComAlguemSobEfeitoDaBebida)) %>%
-      # A linha abaixo exclui possíveis respostas "Não se aplica" ou "Não consumo" que possam ter sobrado
+    tabela_carona_vs_dirigir <- dados_consumidores %>%
       filter(DirigiuSobEfeitoDoAlcool %in% c("Sim", "Não") & PegouCaronaComAlguemSobEfeitoDaBebida %in% c("Sim", "Não")) %>%
       
-      group_by(DirigiuSobEfeitoDoAlcool) %>%
-      count(PegouCaronaComAlguemSobEfeitoDaBebida) %>%
+      group_by(PegouCaronaComAlguemSobEfeitoDaBebida) %>%
+      count(DirigiuSobEfeitoDoAlcool) %>%
       mutate(
         PercentualNumerico = n / sum(n),
         PercentualTexto = scales::percent(PercentualNumerico, accuracy = 0.1)
@@ -1455,21 +1466,17 @@ knitr::kable(
       rename(Quantidade = n)
 
 
-    # --- PASSO 2: TESTE ESTATÍSTICO ---
     tabela_contingencia <- dados_consumidores %>%
       filter(DirigiuSobEfeitoDoAlcool %in% c("Sim", "Não") & PegouCaronaComAlguemSobEfeitoDaBebida %in% c("Sim", "Não")) %>%
-      count(DirigiuSobEfeitoDoAlcool, PegouCaronaComAlguemSobEfeitoDaBebida) %>%
-      tidyr::pivot_wider(names_from = PegouCaronaComAlguemSobEfeitoDaBebida, values_from = n, values_fill = 0)
+      count(PegouCaronaComAlguemSobEfeitoDaBebida, DirigiuSobEfeitoDoAlcool) %>%
+      tidyr::pivot_wider(names_from = DirigiuSobEfeitoDoAlcool, values_from = n, values_fill = 0)
 
     teste_qui_quadrado <- chisq.test(tabela_contingencia[, -1])
     cat("--- Teste Qui-Quadrado de Independência ---\n\n")
     print(teste_qui_quadrado)
     cat("\n\n")
 
-
-    # --- PASSO 3: VISUALIZAÇÃO GRÁFICA ---
-    cat("### Gráfico: Associação entre Comportamentos de Risco\n")
-    ggplot(tabela_riscos_cruzados, aes(x = DirigiuSobEfeitoDoAlcool, y = Quantidade, fill = PegouCaronaComAlguemSobEfeitoDaBebida)) +
+    ggplot(tabela_carona_vs_dirigir, aes(x = PegouCaronaComAlguemSobEfeitoDaBebida, y = Quantidade, fill = DirigiuSobEfeitoDoAlcool)) +
       geom_bar(stat = "identity", position = "fill", alpha = 0.8) +
       geom_text(
         aes(label = PercentualTexto),
@@ -1479,34 +1486,20 @@ knitr::kable(
         fontface = "bold"
       ) +
       scale_y_continuous(labels = scales::percent) +
-      # Paleta de cores para Risco (Sim = Vermelho, Não = Verde)
       scale_fill_manual(
         values = c("Não" = "#2ECC71", "Sim" = "#E74C3C"), 
-        name = "Pegou Carona de Risco?"
+        name = "Dirigiu Alcoolizado?"
       ) +
       labs(
-        title = "Relação entre Dirigir Alcoolizado e Aceitar Carona de Risco",
-        subtitle = "Comparando a proporção de quem aceita carona entre os que dirigem ou não sob efeito de álcool.",
-        x = "Já Dirigiu Sob Efeito de Álcool?",
+        title = "Relação entre Aceitar Carona de Risco e o Hábito de Dirigir Alcoolizado",
+        x = "Já Pegou Carona com Alguém Sob Efeito de Álcool?",
         y = "Proporção de Respostas"
       ) +
-      theme_minimal(base_size = 14) +
-      coord_flip() # Vira o gráfico para melhor leitura dos eixos
-
-
-    # --- PASSO 4: TABELA FORMATADA ---
-    cat("\n\n### Tabela de Cruzamento: Comportamentos de Risco Cruzados\n")
-    # Renomeando colunas para a tabela final ficar mais clara
-    tabela_para_exibir <- tabela_riscos_cruzados %>%
-      rename(
-        `Dirigiu Alcoolizado?` = DirigiuSobEfeitoDoAlcool,
-        `Pegou Carona de Risco?` = PegouCaronaComAlguemSobEfeitoDaBebida,
-        Percentual = PercentualTexto
-      )
+      theme_minimal(base_size = 14)
 
     knitr::kable(
-      tabela_para_exibir,
-      caption = "Tabela de cruzamento entre o hábito de dirigir alcoolizado e o de aceitar carona de risco."
+      tabela_carona_vs_dirigir,
+      caption = "Tabela de cruzamento entre o hábito de aceitar carona de risco e o de dirigir alcoolizado."
     )
     ```
 
@@ -1515,7 +1508,7 @@ knitr::kable(
     Analisamos a proporção entre as pessoas que ingerem álcool e já dirigiram sob o efeito dele
 
     ```{r}
-
+    # --- CÁLCULO
     tabela_risco_dirigir <- dados_consumidores %>%
       filter(!is.na(DirigiuSobEfeitoDoAlcool) & DirigiuSobEfeitoDoAlcool %in% c("Sim", "Não")) %>%
       
@@ -1526,32 +1519,36 @@ knitr::kable(
       ) %>%
       rename(Resposta = DirigiuSobEfeitoDoAlcool, Quantidade = n)
 
+
+    # --- GRÁFICO 
     cat("### Gráfico: Proporção de Consumidores que Já Dirigiram Alcoolizados\n")
     ggplot(tabela_risco_dirigir, aes(x = Resposta, y = Quantidade, fill = Resposta)) +
-      geom_bar(stat = "identity", alpha = 0.8) +
-      # Usamos show.legend = FALSE para remover a legenda, pois ela é redundante com o eixo x
+      geom_bar(stat = "identity", alpha = 0.8, width = 0.7) +
+      
       geom_text(
         aes(label = paste0(Quantidade, " (", PercentualTexto, ")")),
-        vjust = -0.7, # Posição do texto um pouco acima da barra
-        color = "black",
-        size = 4
+        vjust = 1.5,     
+        color = "white",  
+        size = 4,
+        fontface = "bold"
       ) +
-      scale_fill_manual(values = c("Não" = "#2ECC71", "Sim" = "#E74C3C")) +
+      
+      scale_fill_manual(values = c("Não" = "#3498DB", "Sim" = "#E74C3C")) +
       labs(
         title = "Proporção de Consumidores que Já Dirigiram Sob Efeito de Álcool",
         x = "Resposta",
         y = "Número de Respondentes"
       ) +
-      theme_minimal(base_size = 8) +
+      theme_minimal(base_size = 14) +
       theme(legend.position = "none")
 
 
+    # --- TABELA 
     cat("\n\n### Tabela: Proporção de Consumidores que Já Dirigiram Alcoolizados\n")
     knitr::kable(
       tabela_risco_dirigir,
       caption = "Distribuição de respondentes consumidores de álcool segundo o hábito de dirigir após beber."
     )
-
     ```
 
 #### Análise numérica descritiva
