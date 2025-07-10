@@ -2,10 +2,11 @@
 Análise Padrão de consumo alcoólico entre estudantes da UEFS
 </h1>
 
-Projeto desenvolvida durante a disciplina Exa709 - Probabilidade e Estatística, visamos com autilização de um formulário com 
-perguntas socioeconômicas entender o padrão de consumo alcoólico entre os estudantes da UEFS (Universidade Estadual de Feira
-de Santana). Ao todo foram relaizadas 25 perguntas respondidas por uma amostra de 71 estudantes, importante salientar que as 
-respostas obtidas foram anônimas e somente utilizadas para fins acadêmicos.
+<h4 style="text-align: center">
+Projeto desenvolvida durante a disciplina Exa709 - Probabilidade e Estatística
+</h4>
+
+O presente trabalho tem como objetivo entender o padrão de consumo alcoólico entre os estudantes da UEFS (Universidade Estadual de Feirade Santana). Com a utilização de um formulário foram realizadas 25 perguntas respondidas por uma amostra de 71 estudantes, importante salientar que as respostas obtidas foram anônimas e somente utilizadas para fins acadêmicos.
 
 A partir dos resultados obtidos, foram realizados estudos univariados e bivariados, buscando entender padrões entre diversas 
 catacterísticas abordadas. As informações referentes a pesquisa e resultados podem ser visualizadas clicando
